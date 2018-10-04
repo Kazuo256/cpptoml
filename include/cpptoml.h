@@ -3402,7 +3402,7 @@ class toml_writer
     /**
      * Escape a string for output.
      */
-    static std::string escape_string(const std::string& str)
+    static std::string escape_string(const std::string& str, bool multiline = false)
     {
         std::string res;
         for (auto it = str.begin(); it != str.end(); ++it)
@@ -3415,7 +3415,7 @@ class toml_writer
             {
                 res += "\\t";
             }
-            else if (*it == '\n')
+            else if (*it == '\n' && !multiline)
             {
                 res += "\\n";
             }
@@ -3423,7 +3423,7 @@ class toml_writer
             {
                 res += "\\f";
             }
-            else if (*it == '\r')
+            else if (*it == '\r' && !multiline)
             {
                 res += "\\r";
             }
@@ -3456,9 +3456,18 @@ class toml_writer
      */
     void write(const value<std::string>& v)
     {
-        write("\"");
-        write(escape_string(v.get()));
-        write("\"");
+        if (v->get().find('\n') == string::npos)
+        {
+            write("\"");
+            write(escape_string(v.get()));
+            write("\"");
+        }
+        else
+        {
+            write("\"\"\"\n");
+            write(escape_string(v.get(), true));
+            write("\"\"\"");
+        }
     }
 
     /**
