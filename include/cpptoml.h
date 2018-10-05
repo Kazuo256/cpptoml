@@ -3435,7 +3435,7 @@ class toml_writer
             {
                 res += "\\\\";
             }
-            else if ((const uint32_t)*it <= 0x001f)
+            else if ((const uint32_t)*it <= 0x001f && (!multiline && (*it != '\r' && *it != '\n')))
             {
                 res += "\\u";
                 std::stringstream ss;
@@ -3456,7 +3456,7 @@ class toml_writer
      */
     void write(const value<std::string>& v)
     {
-        if (v->get().find('\n') == string::npos)
+        if (v.get().find('\n') == std::string::npos)
         {
             write("\"");
             write(escape_string(v.get()));
